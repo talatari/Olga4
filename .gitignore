@@ -1,0 +1,10 @@
+
+*.log
+config.py
+
+.idea
+__pycache__
+
+backup/*
+logs/*
+DB/*
