@@ -1,18 +1,30 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 # v.1.4
 import telebot
-from telebot import types
-
 import datetime
 import numbers
+import pathlib
+
+from telebot import types
+from loguru import logger
+from time import sleep
 
 import db
 import config
 
+
 bot = telebot.TeleBot(config.TOKEN, threaded=False)
 
 global len_urls, id_edit_message_add_urls
+
+log_dir = pathlib.Path.home().joinpath('logs')
+log_dir.mkdir(parents=True, exist_ok=True)
+
+logger.add(log_dir.joinpath('bot-olga-service.log'),
+           format='{time} [{level}] {module} {name} {function} - {message}',
+           level='DEBUG', compression='zip', rotation='30 MB')
+
 
 #######################################################################################################################
 
@@ -21,13 +33,15 @@ global len_urls, id_edit_message_add_urls
 #db.init_db(FORCE_USERS=True)
 
 #######################################################################################################################
+def get_datetime():
+    from datetime import datetime, timezone
+    return str(datetime.now(timezone.utc))
+
+
 
 def save_user_message(message):
     try:
-        file_log = open('logs/bot.log', 'a')
-        now = datetime.datetime.now()
-
-        str_logs = str(now) + " -- message_from_id_user: " + str(message.chat.id) + "\n"
+        str_logs = get_datetime() + " -- message_from_id_user: " + str(message.chat.id) + "\n"
         str_logs += " + message_id: " + str(message.message_id) + "\n"
         str_logs += " + message.chat.type: " + str(message.chat.type) + "\n"
         str_logs += " + content_type: " + str(message.content_type) + "\n"
@@ -42,23 +56,19 @@ def save_user_message(message):
         str_logs += "\n"
 
         try:
-            file_log.write(str_logs)
+            logger.info(str_logs)
             print(str_logs)
         except:
-            file_log.write(str_logs_with_smiles)
+            logger.info(str_logs_with_smiles)
             print(str_logs_with_smiles)
-
-        file_log.close()
     except Exception as e:
+        logger.error(str(e))
         print(repr(e))
 
 
 def save_bot_message(message, text: str):
     try:
-        file_log = open('logs/bot.log', 'a')
-        now = datetime.datetime.now()
-
-        str_logs = str(now) + " -- BOT SEND in message.chat.id: " + str(message.chat.id) + "\n"
+        str_logs = get_datetime() + " -- BOT SEND in message.chat.id: " + str(message.chat.id) + "\n"
         str_logs += " + message_id: " + str(message.message_id) + "\n"
         str_logs += " + message.chat.type: " + str(message.chat.type) + "\n"
         str_logs += " + content_type: " + str(message.content_type) + "\n"
@@ -68,33 +78,24 @@ def save_bot_message(message, text: str):
         str_logs += " + message.text: " + str(text) + "\n"
         str_logs += "\n"
 
-        file_log.write(str_logs)
+        logger.info(str_logs)
         print(str_logs)
-
-        file_log.close()
     except Exception as e:
+        logger.error(str(e))
         print(repr(e))
 
 def save_bot_admins_message(id: int, text: str):
-    file_log = open('logs/bot.log', 'a')
-    now = datetime.datetime.now()
-
-    str_logs = str(now) + " -- BOT SEND in message.chat.id: " + str(id) + "\n"
+    str_logs = get_datetime() + " -- BOT SEND in message.chat.id: " + str(id) + "\n"
     str_logs += " + text: " + text + "\n"
     str_logs += "\n"
 
-    file_log.write(str_logs)
+    logger.info(str_logs)(str_logs)
     print(str_logs)
-
-    file_log.close()
 
 
 def save_other_message(message):
     try:
-        file_log = open('logs/bot.log', 'a')
-        now = datetime.datetime.now()
-
-        str_logs = str(now) + " -- message_from_id_user: " + str(message.chat.id) + "\n"
+        str_logs = get_datetime() + " -- message_from_id_user: " + str(message.chat.id) + "\n"
         str_logs += " + message_id: " + str(message.message_id) + "\n"
         str_logs += " + content_type: " + str(message.content_type) + "\n"
         str_logs += " + message.chat.type: " + str(message.chat.type) + "\n"
@@ -103,11 +104,10 @@ def save_other_message(message):
         str_logs += " + from_user.username: " + str(message.from_user.username) + "\n"
         str_logs += "\n"
 
-        file_log.write(str_logs)
+        logger.info(str_logs)
         print(str_logs)
-
-        file_log.close()
     except Exception as e:
+        logger.error(str(e))
         print(repr(e))
 
 #######################################################################################################################
@@ -863,12 +863,12 @@ def add_save(message):
 
 #######################################################################################################################
 
-from time import sleep
 while True:
     try:
         bot.polling(none_stop=True, timeout=120)
     except Exception as e:
         print(repr(e))
+        logger.error(str(e))
         sleep(5)
 
 
