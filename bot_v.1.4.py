@@ -89,7 +89,7 @@ def save_bot_admins_message(id: int, text: str):
     str_logs += " + text: " + text + "\n"
     str_logs += "\n"
 
-    logger.info(str_logs)(str_logs)
+    logger.info(str_logs)
     print(str_logs)
 
 
@@ -697,6 +697,16 @@ def text_from_user(message):
                 "Сообщение: "  + message.text + "~"
                 bot.send_message(370314854, text=text, reply_markup=security)
                 save_bot_admins_message(370314854, text)
+
+                # рассылка мне -- добавить пользователя
+                text = "USER ID = " + \
+                str(message.from_user.id) + "\n" + "\n" + \
+                str(message.from_user.first_name) + " " + \
+                str(message.from_user.last_name) + " @" + \
+                str(message.from_user.username) + "\n" + "\n" + \
+                "Сообщение: "  + message.text + "~"
+                bot.send_message(810118921, text=text, reply_markup=security)
+                save_bot_admins_message(810118921, text)
 
 
             except Exception as e:
