@@ -698,7 +698,7 @@ def text_from_user(message):
                 bot.send_message(370314854, text=text, reply_markup=security)
                 save_bot_admins_message(370314854, text)
 
-                # рассылка мне -- добавить пользователя
+                # рассылка Диана -- добавить пользователя
                 text = "USER ID = " + \
                 str(message.from_user.id) + "\n" + "\n" + \
                 str(message.from_user.first_name) + " " + \
